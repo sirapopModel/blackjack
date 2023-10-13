@@ -32,6 +32,11 @@ class Player
       end
       return sum
     end
+
+    def request_deal(dealer)
+      bottom_card = dealer.deal_one()
+      @hand.push(bottom_card)
+    end
   end
   
   # Human Class extends PLayer
