@@ -1,8 +1,14 @@
 # https://jedi.mycohort.download/second-language/week-19/day-3/labs/ruby-blackjack/
-
+require "./Card.rb"
+require "./Player.rb"
 # Game Class
 class Game
-    attr_reader :computer_dealer ,:human_player,  :round_winner, :game_winner, :round_number, :num_decks, :deck
+    attr_reader :computer_dealer ,:human_player, :num_decks , :deck
+    attr_writer :game_winner, :round_number , :round_winner
+
+    def deck 
+      @deck
+    end
     def initialize(human, computer, deck_count)
       @human_player = human
       @computer_dealer = computer
@@ -10,6 +16,7 @@ class Game
       @game_winner = 'none yet'
       @round_number = 0
       @num_decks = deck_count
+      @deck = []
       compose_deck
     end
   
@@ -21,7 +28,7 @@ class Game
     end
   
     def empty_deck
-      deck = []
+      @deck = []
     end
   
     # :reek:NestedIterators
@@ -29,18 +36,18 @@ class Game
       suits = %w[♠ ♥ ♦ ♣]
       num_array = (1..9)
       suits.each do |s|
-        deck.push(Card.new(11, s, '🂡'))
+        @deck.push(Card.new(11, s, '🂡'))
         num_array.each do |c|
-          deck.push(Card.new((c + 1), s, '#'))
+          @deck.push(Card.new((c + 1), s, '#'))
         end
-        deck.push(Card.new(10, s, '🂫'))
-        deck.push(Card.new(10, s, '🂭'))
-        deck.push(Card.new(10, s, '🂮'))
+        @deck.push(Card.new(10, s, '🂫'))
+        @deck.push(Card.new(10, s, '🂭'))
+        @deck.push(Card.new(10, s, '🂮'))
       end
     end
   
     def shuffle_deck
-      deck = deck.shuffle
+      @deck = @deck.shuffle
     end
   
     def deal
@@ -51,7 +58,7 @@ class Game
       dealing_to_house = true
       temp = @num_decks.positive?
       while cards_to_deal.positive? && temp
-        if deck.length.zero?
+        if @deck.length.zero?
           compose_deck
           redo
         end
@@ -67,7 +74,7 @@ class Game
     end
   
     def deal_one(player)
-      bottom_card = deck.shift
+      bottom_card = @deck.shift
       if bottom_card
         @human_player.hand.push(bottom_card) if player.instance_of?(Human)
         @computer_dealer.hand.push(bottom_card) if player.instance_of?(Computer)
@@ -97,90 +104,6 @@ class Game
       puts "#{computer_dealer.name}'s bankroll: $#{computer_dealer.bankroll}"
     end
   end
-  
-  # Player Module
-  class Player
-    attr_reader :name, :bankroll, :hand
-  
-    def initialize(name, bankroll)
-      @name = name
-      @bankroll = bankroll
-      @hand = []
-    end
-  
-    def print_hand
-      @hand.each { |e| puts e.print_card }
-    end
-  
-    # :reek:FeatureEnvy
-    def sum_hand
-      sum = 0
-      aces = @hand.select { |k| k.value == 11 }
-  
-      # add all non-aces first
-      @hand.map do |c, _|
-        c_val = c.value
-        sum += c_val if c_val != 11
-      end
-      total = 0 
-
-      aces.map do |a, _|
-        a_val = a.value
-        total = sum + a_val
-        ace_value = (total > 21) ? (1) : a_val
-        sum += ace_value
-      end
-      return sum
-    end
-  end
-  
-  # Human Class extends PLayer
-  class Human < Player
-    attr_reader :wants_hit
-  
-    def initialize(name, bankroll)
-      super
-      @wants_hit = true
-    end
-  
-    def stay
-      @wants_hit = false
-    end
-  end
-  
-  # Computer Class extends PLayer
-  class Computer < Player
-    def initialize
-      super 'the_house', 10_000
-    end
-    
-    def print_first
-      e = hand[0]
-      puts e.print_card
-    end
-  
-    def print_second
-      e = hand[1]
-      puts e.print_card
-    end
-  end
-  
-  # Card Class
-  class Card
-    attr_reader :value,:suit, :face
-        
-    def initialize(value, suit, face)
-      @value = value
-      @suit = suit
-      @face = face
-    end
-
-    def print_card()
-      return @value+","+@suit+","+@face
-    end
-    
-  end
-  
   # ! Init Game
   puts 'Welcome to ruby blackjack!'
   puts 'Please enter your name'
