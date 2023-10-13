@@ -2,8 +2,7 @@
 
 # Game Class
 class Game
-    attr_accessor :human_player, :computer_dealer, :round_winner, :game_winner, :round_number, :num_decks, :deck
-  
+    attr_reader :computer_dealer ,:human_player,  :round_winner, :game_winner, :round_number, :num_decks, :deck
     def initialize(human, computer, deck_count)
       @human_player = human
       @computer_dealer = computer
@@ -22,24 +21,26 @@ class Game
     end
   
     def empty_deck
-      @deck = []
+      deck = []
     end
   
+    # :reek:NestedIterators
     def fill_deck
       suits = %w[♠ ♥ ♦ ♣]
-      (0..(suits.length - 1)).each do |s|
-        @deck.push(Card.new(11, suits[s], '🂡'))
-        (1..9).each do |c|
-          @deck.push(Card.new((c + 1), suits[s], '#'))
+      num_array = (1..9)
+      suits.each do |s|
+        deck.push(Card.new(11, s, '🂡'))
+        num_array.each do |c|
+          deck.push(Card.new((c + 1), s, '#'))
         end
-        @deck.push(Card.new(10, suits[s], '🂫'))
-        @deck.push(Card.new(10, suits[s], '🂭'))
-        @deck.push(Card.new(10, suits[s], '🂮'))
+        deck.push(Card.new(10, s, '🂫'))
+        deck.push(Card.new(10, s, '🂭'))
+        deck.push(Card.new(10, s, '🂮'))
       end
     end
   
     def shuffle_deck
-      @deck = @deck.shuffle
+      deck = deck.shuffle
     end
   
     def deal
@@ -48,8 +49,9 @@ class Game
   
       cards_to_deal = 4
       dealing_to_house = true
-      while cards_to_deal.positive? && @num_decks.positive?
-        if @deck.length.zero?
+      temp = @num_decks.positive?
+      while cards_to_deal.positive? && temp
+        if deck.length.zero?
           compose_deck
           redo
         end
@@ -61,11 +63,11 @@ class Game
         dealing_to_house = !dealing_to_house
         cards_to_deal -= 1
       end
-      puts 'No more cards left to deal' unless @num_decks.positive?
+      puts 'No more cards left to deal' unless temp
     end
   
     def deal_one(player)
-      bottom_card = @deck.shift
+      bottom_card = deck.shift
       if bottom_card
         @human_player.hand.push(bottom_card) if player.instance_of?(Human)
         @computer_dealer.hand.push(bottom_card) if player.instance_of?(Computer)
@@ -98,7 +100,7 @@ class Game
   
   # Player Module
   class Player
-    attr_accessor :name, :bankroll, :hand
+    attr_reader :name, :bankroll, :hand
   
     def initialize(name, bankroll)
       @name = name
@@ -107,31 +109,34 @@ class Game
     end
   
     def print_hand
-      @hand.each { |e| puts "#{e.value} #{e.suit} [#{e.face}]" }
+      @hand.each { |e| puts e.print_card }
     end
   
+    # :reek:FeatureEnvy
     def sum_hand
       sum = 0
       aces = @hand.select { |k| k.value == 11 }
   
       # add all non-aces first
-      @hand.map do |k, _|
-        sum += k.value if k.value != 11
+      @hand.map do |c, _|
+        c_val = c.value
+        sum += c_val if c_val != 11
       end
-      aces.map do |k, _|
-        if (sum + k.value) > 21
-          sum += 1
-        elsif (sum + k.value) <= 21
-          sum += k.value
-        end
+      total = 0 
+
+      aces.map do |a, _|
+        a_val = a.value
+        total = sum + a_val
+        ace_value = (total > 21) ? (1) : a_val
+        sum += ace_value
       end
-      sum
+      return sum
     end
   end
   
   # Human Class extends PLayer
   class Human < Player
-    attr_accessor :wants_hit
+    attr_reader :wants_hit
   
     def initialize(name, bankroll)
       super
@@ -148,28 +153,32 @@ class Game
     def initialize
       super 'the_house', 10_000
     end
-  
+    
     def print_first
-      e = @hand[0]
-      puts "#{e.value} #{e.suit} [#{e.face}]"
+      e = hand[0]
+      puts e.print_card
     end
   
     def print_second
-      e = @hand[1]
-      puts "#{e.value} #{e.suit} [#{e.face}]"
+      e = hand[1]
+      puts e.print_card
     end
   end
   
   # Card Class
   class Card
-    attr_accessor :suit, :face
-    attr_reader :value
-  
+    attr_reader :value,:suit, :face
+        
     def initialize(value, suit, face)
       @value = value
       @suit = suit
       @face = face
     end
+
+    def print_card()
+      return @value+","+@suit+","+@face
+    end
+    
   end
   
   # ! Init Game
