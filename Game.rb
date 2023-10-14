@@ -18,8 +18,8 @@ class Game
       @dealer.compose_deck
     end
     def deal
-      @human_player.hand = []
-      @computer_dealer.hand = []
+      @human_player.empty_hand()
+      @computer_dealer.empty_hand()
   
       cards_to_deal = 4
       dealing_to_house = true
@@ -31,10 +31,10 @@ class Game
         end
         if dealing_to_house
           bottom_card = @dealer.deal_one()
-          @computer_dealer.hand.push(bottom_card)
+          @computer_dealer.add_card(bottom_card)
         else
           bottom_card = @dealer.deal_one()
-          @human_player.hand.push(bottom_card)
+          @human_player.add_card(bottom_card)
         end
         dealing_to_house = !dealing_to_house
         cards_to_deal -= 1

@@ -37,6 +37,13 @@ class Player
       bottom_card = dealer.deal_one()
       @hand.push(bottom_card)
     end
+
+    def add_card(bottom_card)
+      @hand.push(bottom_card)
+    end
+    def empty_hand()
+      @hand = []
+    end
   end
   
   # Human Class extends PLayer
