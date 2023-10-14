@@ -1,4 +1,5 @@
 require "./Card.rb"
+ #Dealer deal a card , compose and controls a deck 
 class Dealer
     attr_reader :deck,:num_decks
     def initialize(num_decks)
@@ -20,15 +21,9 @@ class Dealer
     # :reek:NestedIterators
     def fill_deck
         suits = %w[♠ ♥ ♦ ♣]
-        num_array = (1..9)
-        suits.each do |s|
-          @deck.push(Card.new(11, s, '🂡'))
-          num_array.each do |c|
-            @deck.push(Card.new((c + 1), s, '#'))
-          end
-          @deck.push(Card.new(10, s, '🂫'))
-          @deck.push(Card.new(10, s, '🂭'))
-          @deck.push(Card.new(10, s, '🂮'))
+        suits.each do |suit|
+            fill_card_faces(suit)
+            fill_card_num(suit)
         end
     end
 
@@ -53,4 +48,17 @@ class Dealer
         @deck.length.zero?
     end
 
+    private
+    def fill_card_num(suit)
+        num_array = (1..9)
+        num_array.each do |num|
+            @deck.push(Card.new((num + 1), suit, '#'))
+        end
+    end
+    def fill_card_faces(suit)
+        @deck.push(Card.new(11, suit, '🂡'))
+        @deck.push(Card.new(10, suit, '🂫'))
+        @deck.push(Card.new(10, suit, '🂭'))
+        @deck.push(Card.new(10, suit, '🂮'))
+    end
 end

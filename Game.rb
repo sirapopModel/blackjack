@@ -5,8 +5,8 @@ require "./Dealer.rb"
 class Game
     attr_reader :computer_dealer ,:human_player,:dealer , :in_round
     attr_writer :game_winner, :round_number , :round_winner ,:in_round
-    def initialize(human, computer,deck_count)
-      @dealer = Dealer.new(deck_count)
+    def initialize(human, computer,dealer)
+      @dealer = dealer
       @human_player = human
       @computer_dealer = computer
 
@@ -17,8 +17,6 @@ class Game
 
       @dealer.compose_deck
     end
-  
-  
     def deal
       @human_player.hand = []
       @computer_dealer.hand = []
@@ -97,5 +95,4 @@ class Game
         puts 'hit (h) or stay (s)?'
     end
   end
-  
 end

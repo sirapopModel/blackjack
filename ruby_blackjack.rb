@@ -12,8 +12,8 @@ require "./Game.rb"
   
   human = Human.new human_name, 1000
   house = Computer.new
-  game = Game.new human, house, 99
-  dealer = game.dealer
+  dealer = Dealer.new(deck_count = 99 )
+  game = Game.new human, house , dealer
 
   # game.deck.each { |e| puts "#{e.suit}, #{e.value}, #{e.face}" }
   
